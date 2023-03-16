@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Open Redirect Scanner</title>
+</head>
+<body>
+  <h1>Open Redirect Scanner</h1>
+  <form action="/scan" method="POST">
+    <label for="urls">Enter URLs (one per line):</label><br>
+    <textarea id="urls" name="urls" rows="10" cols="50"></textarea><br>
+    <button type="submit">Scan</button>
+  </form>
+  <div id="result"></div>
+  <script>
+    const form = document.querySelector('form');
+    const resultDiv = document.querySelector('#result');
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const formData = new FormData(event.target);
+      const response = await fetch('/scan', {
+        method: 'POST',
+        body: formData
+      });
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let result = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        result += decoder.decode(value);
+        resultDiv.innerText = result;
+      }
+    });
+  </script>
+</body>
+</html>
+
